@@ -188,6 +188,15 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     }
 // dessin de la carte du jeu
     private void paintcarte(Canvas canvas) {
+        int x=getWidth();
+
+        Paint paint2 = new Paint();
+
+        paint2.setColor(Color.BLACK);
+      
+
+        canvas.save();
+
         int tailleCarre = un.getHeight();
         for (int i = 0; i < carteHeight; i++) {
             for (int j = 0; j < carteWidth; j++) {
@@ -201,7 +210,9 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
                         break;
                     case CST_deux:
                         canvas.drawBitmap(deux, j *80, 145+ i*80 , null);
+                        canvas.drawLine(0, 0, x, 0,paint2);
                         break;
+
                     case CST_trois:
                         canvas.drawBitmap(trois, j *80, 145+ i*80 , null);
                         break;
@@ -210,7 +221,7 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
                         break;
                     case CST_cinq:
                         canvas.drawBitmap(cinq, j *80, 145+ i*80 , null);
-                        break;
+                        canvas.drawLine(0, 0, x, 0,paint2);                 break;
                     case CST_six:
                         canvas.drawBitmap(six, j *80, 145+ i*80 , null);
                         break;
