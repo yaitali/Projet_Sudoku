@@ -16,6 +16,7 @@ import android.view.SurfaceView;
 
 public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
     // Declaration des images
+   // private Bitmap vert;
     private Bitmap vide;
     private Bitmap un;
     private Bitmap deux;
@@ -48,8 +49,8 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     private Resources mRes;
     private Context mContext;
 
-
-
+    int compteur=0;
+    int CaseChoisiePetiteMat;
 
     private RectF RectButtonSupprimer;
 
@@ -76,6 +77,8 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     static final int CST_huite = 8;
     static final int CST_neuf = 9;
     static final int CST_Vide = 0;
+    static final int CST_vert = 77;
+
     // constante modelisant les differentes types de cases de gestion celelules
     static final int G_un = 1;
     static final int G_deux = 2;
@@ -140,6 +143,7 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
         mContext = context;
         mRes = mContext.getResources();
          un 		= BitmapFactory.decodeResource(mRes, R.drawable.un);
+         //vert = BitmapFactory.decodeResource(mRes, R.drawable.vert);
          deux = BitmapFactory.decodeResource(mRes, R.drawable.deux);
          trois		= BitmapFactory.decodeResource(mRes, R.drawable.trois);
          quatre 	= BitmapFactory.decodeResource(mRes, R.drawable.quatre);
@@ -180,27 +184,41 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
 
     }
 
+   /* public void SelectedCaseVert(int i, int j){
+        if (matrice[i][j]== CST_Vide){
+            matrice[i][j]= CST_vert;
+            compteur=1;
+        }
 
-        public int LaCaseChoiisePetiteMat(int i, int j) {
+    }
+*/
 
 
-            if (i == 0 && j == 0) {
+    /**
+     *
+     * @param i
+     * @param j
+     * @return chiffre ;le chiffre representant le bouton sur le quel on clique
+     */
+        public int LaCaseChoisiePetiteMat(int i, int j) {
+
+            if (i == 0 && j == 0) { compteur=2;
                 return 1;
-            } else if (i == 0 && j == 1) {
+            } else if (i == 0 && j == 1) { compteur=2;
                 return 2;
-            } else if (i == 0 && j == 2) {
+            } else if (i == 0 && j == 2) { compteur=2;
                 return 3;
-            } else if (i == 1 && j == 0) {
+            } else if (i == 1 && j == 0) { compteur=2;
                 return 4;
-            } else if (i == 1 && j == 1) {
+            } else if (i == 1 && j == 1) { compteur=2;
                 return 5;
-            } else if (i == 1 && j == 2) {
+            } else if (i == 1 && j == 2) { compteur=2;
                 return 6;
-            } else if (i == 2 && j == 0) {
+            } else if (i == 2 && j == 0) { compteur=2;
                 return 7;
-            } else if (i == 2 && j == 1) {
+            } else if (i == 2 && j == 1) { compteur=2;
                 return 8;
-            } else if (i == 2 && j == 2) {
+            } else if (i == 2 && j == 2) {compteur=2;
                 return 9;
             }
             else {
@@ -229,6 +247,9 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
             for (int j = 0; j < carteWidth; j++) {
 
                 switch (matrice[i][j]) {
+                   /* case CST_vert:
+                        canvas.drawBitmap(vert, j *80, 145+ i*80 , null);
+                        break;*/
                     case CST_Vide:
                         canvas.drawBitmap(vide, j *80, 145+ i*80 , null);
                         break;
@@ -237,7 +258,6 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
                         break;
                     case CST_deux:
                         canvas.drawBitmap(deux, j *80, 145+ i*80 , null);
-
                         break;
 
                     case CST_trois:
@@ -312,19 +332,18 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
 
 
     }
+        /**
+         * RectButtonSupprimer
+         */
 
         Paint paintYellow = new Paint();
-        paintYellow.setColor(Color.YELLOW);
+        paintYellow.setColor(Color.GRAY);
         float tailleUnCarre=getWidth()/9;
-
         float tailleMatrice=getWidth()+145+40;
-
         float left=(tailleUnCarre*3)+50;
         float top=tailleMatrice;
         float right=left+160;
         float bottom=top+80;
-
-
 
         RectButtonSupprimer=new RectF(left, top, right, bottom);
         canvas.drawRect(RectButtonSupprimer,paintYellow );
@@ -385,56 +404,64 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
         Log.i("-> FCT <-", "event.getX: " + event.getX());
         Log.i("-> FCT <-", "event.getY: " + event.getY());
         Log.i("-> FCT <-", "getWidth: " + deux.getWidth());
-
-
-
-
         float x=event.getX();
         float y=event.getY();
         Log.i("-> FCT <-", "event.getX: " +x);
         Log.i("-> FCT <-", "event.getY: " +y);
-
         int j= (int) (x/(getWidth()/9));
         int i= (int) ((y/(getWidth()/9))-((y/(getWidth()/9))/(y/145)));
         int jPetitMat= (int) ((x/(getWidth()/9)));
         int iPetitMat= (int) (((y/(getWidth()/9))-((y/(getWidth()/9))/(y/145+40)))-11);
         Log.i("-> FCT <-", "i=: " +i);
         Log.i("-> FCT <-", "j=: " +j);
-
         Log.i("-> FCT <-", "iPetitMat=: " +(iPetitMat-11));
         Log.i("-> FCT <-", "jPetitMat=: " +jPetitMat);
-
-        int CaseChoisiePetiteMat=LaCaseChoiisePetiteMat(iPetitMat,jPetitMat);
-
-
-        if (CaseChoisiePetiteMat==3){
-            matrice[1][3]=CST_cinq;
-        }
-
         Log.i("-> FCT <-", "case" + "=: " +CaseChoisiePetiteMat);
-
-
-
-
+        CaseChoisiePetiteMat=LaCaseChoisiePetiteMat(iPetitMat,jPetitMat);
+        if (CaseChoisiePetiteMat==1){
+            matrice[2][4]=CST_un;
+        }else if (CaseChoisiePetiteMat==2){
+            matrice[2][4]=CST_deux;
+        }else if (CaseChoisiePetiteMat==3){
+            matrice[2][4]=CST_trois;
+        }else if (CaseChoisiePetiteMat==4){
+            matrice[2][4]=CST_quatre;
+        }else if (CaseChoisiePetiteMat==5){
+            matrice[2][4]=CST_cinq;
+        }else if (CaseChoisiePetiteMat==6){
+            matrice[2][4]=CST_six;
+        }else if (CaseChoisiePetiteMat==7){
+            matrice[2][4]=CST_sept;
+        }else if (CaseChoisiePetiteMat==8){
+            matrice[2][4]=CST_huite;
+        }
+        else if (CaseChoisiePetiteMat==9){
+            matrice[2][4]=CST_neuf;
+        }
 
 
 
         //button jaune
-        float leftRectButton= RectButtonSupprimer.left;
-        float topRectButton= RectButtonSupprimer.top;
-        float widthRectButton= RectButtonSupprimer.width();
-        float heightRectButton= RectButtonSupprimer.height();
+        float leftRectButton=       RectButtonSupprimer.left;
+        float topRectButton=        RectButtonSupprimer.top;
+        float widthRectButton=      RectButtonSupprimer.width();
+        float heightRectButton=     RectButtonSupprimer.height();
 
         Log.i("-> FCT <-", "leftRectButton" + "=: " +leftRectButton);
         Log.i("-> FCT <-", "topRectButton" + "=: " +topRectButton);
 
 
 
+        if(x>leftRectButton && x<(leftRectButton+widthRectButton) && y>topRectButton && x<(topRectButton+heightRectButton) ){
+            Log.i("-> FCT <-", "bouton Jaune ");
+        }
+
+
+
 
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                Log.i("-> FCT <-", "onTouchEvent: Down Amar ");
-
+                Log.i("-> FCT <-", "onTouchEvent: Down ");
 
                 break;
             case MotionEvent.ACTION_UP:
@@ -449,5 +476,8 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
                 break;
         }
         return true;
+
+
+
     }
 }
