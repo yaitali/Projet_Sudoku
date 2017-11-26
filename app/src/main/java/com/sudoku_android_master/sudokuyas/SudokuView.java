@@ -5,14 +5,14 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.graphics.Color;
 
 public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
     // Declaration des images
@@ -47,6 +47,11 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     // Declaration des objets Ressources et Context permettant d'accéder aux ressources de l'application et de les charger
     private Resources mRes;
     private Context mContext;
+
+
+
+
+    private RectF RectButtonSupprimer;
 
     // tableau modelisant la carte du jeu
     int[][] matrice;
@@ -175,6 +180,35 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
 
     }
 
+
+        public int LaCaseChoiisePetiteMat(int i, int j) {
+
+
+            if (i == 0 && j == 0) {
+                return 1;
+            } else if (i == 0 && j == 1) {
+                return 2;
+            } else if (i == 0 && j == 2) {
+                return 3;
+            } else if (i == 1 && j == 0) {
+                return 4;
+            } else if (i == 1 && j == 1) {
+                return 5;
+            } else if (i == 1 && j == 2) {
+                return 6;
+            } else if (i == 2 && j == 0) {
+                return 7;
+            } else if (i == 2 && j == 1) {
+                return 8;
+            } else if (i == 2 && j == 2) {
+                return 9;
+            }
+            else {
+                return 99;
+            }
+
+        }
+
     // initialisation du jeu
     public void initparameters() {
         matrice = new int[carteHeight][carteWidth];
@@ -190,13 +224,6 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     private void paintcarte(Canvas canvas) {
         int x=getWidth();
 
-        Paint paint2 = new Paint();
-
-        paint2.setColor(Color.BLACK);
-      
-
-        canvas.save();
-
         int tailleCarre = un.getHeight();
         for (int i = 0; i < carteHeight; i++) {
             for (int j = 0; j < carteWidth; j++) {
@@ -210,7 +237,7 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
                         break;
                     case CST_deux:
                         canvas.drawBitmap(deux, j *80, 145+ i*80 , null);
-                        canvas.drawLine(0, 0, x, 0,paint2);
+
                         break;
 
                     case CST_trois:
@@ -221,7 +248,7 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
                         break;
                     case CST_cinq:
                         canvas.drawBitmap(cinq, j *80, 145+ i*80 , null);
-                        canvas.drawLine(0, 0, x, 0,paint2);                 break;
+                                       break;
                     case CST_six:
                         canvas.drawBitmap(six, j *80, 145+ i*80 , null);
                         break;
@@ -245,31 +272,31 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
 
                 switch (mat_gestion [i][j]) {
                     case G_un:
-                        canvas.drawBitmap(un, j * getWidth() / 9, tailleCarre *  11+ 40 + un.getHeight() + (i * getWidth() / 9), null);
+                        canvas.drawBitmap(un, j * getWidth() / 9, getWidth()+145+40+(i * getWidth() / 9), null);
                         break;
                     case G_deux:
-                        canvas.drawBitmap(deux, j * getWidth() / 9, tailleCarre *  11+ 40 + un.getHeight() + (i * getWidth() / 9), null);
+                        canvas.drawBitmap(deux, j * getWidth() / 9, getWidth()+145+40+(i * getWidth() / 9), null);
                         break;
                     case G_trois:
-                        canvas.drawBitmap(trois, j * getWidth() / 9, tailleCarre *  11+ 40 + un.getHeight() + (i * getWidth() / 9), null);
+                        canvas.drawBitmap(trois, j * getWidth() / 9, getWidth()+145+40+(i * getWidth() / 9), null);
                         break;
                     case G_quatre:
-                        canvas.drawBitmap(quatre, j * getWidth() / 9, tailleCarre *  11+ 40 + un.getHeight() + (i * getWidth() / 9), null);
+                        canvas.drawBitmap(quatre, j * getWidth() / 9, getWidth()+145+40+(i * getWidth() / 9), null);
                         break;
                     case G_cinq:
-                        canvas.drawBitmap(cinq, j * getWidth() / 9, tailleCarre *  11+ 40 + un.getHeight() + (i * getWidth() / 9), null);
+                        canvas.drawBitmap(cinq, j * getWidth() / 9, getWidth()+145+40+(i * getWidth() / 9), null);
                         break;
                     case G_six:
-                        canvas.drawBitmap(six, j * getWidth() / 9, tailleCarre *  11+ 40 + un.getHeight() + (i * getWidth() / 9), null);
+                        canvas.drawBitmap(six, j * getWidth() / 9, getWidth()+145+40+(i * getWidth() / 9), null);
                         break;
                     case G_sept:
-                        canvas.drawBitmap(sept, j * getWidth() / 9, tailleCarre *  11+ 40 + un.getHeight() + (i * getWidth() / 9), null);
+                        canvas.drawBitmap(sept, j * getWidth() / 9, getWidth()+145+40+(i * getWidth() / 9), null);
                         break;
                     case G_huite:
-                        canvas.drawBitmap(huite, j * getWidth() / 9, tailleCarre *  11+ 40 + un.getHeight() + (i * getWidth() / 9), null);
+                        canvas.drawBitmap(huite, j * getWidth() / 9, getWidth()+145+40+(i * getWidth() / 9), null);
                         break;
                     case G_neuf:
-                        canvas.drawBitmap(neuf, j * getWidth() / 9, tailleCarre *  11+ 40 + un.getHeight() + (i * getWidth() / 9), null);
+                        canvas.drawBitmap(neuf, j * getWidth() / 9, getWidth()+145+40+(i * getWidth() / 9), null);
                         break;
 
                 }
@@ -284,36 +311,37 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
 
 
 
-    }}
+    }
+
+        Paint paintYellow = new Paint();
+        paintYellow.setColor(Color.YELLOW);
+        float tailleUnCarre=getWidth()/9;
+
+        float tailleMatrice=getWidth()+145+40;
+
+        float left=(tailleUnCarre*3)+50;
+        float top=tailleMatrice;
+        float right=left+160;
+        float bottom=top+80;
+
+
+
+        RectButtonSupprimer=new RectF(left, top, right, bottom);
+        canvas.drawRect(RectButtonSupprimer,paintYellow );
+
+    }
 
     // dessin du jeu (fond uni, en fonction du jeu gagne ou pas dessin du plateau et du joueur des diamants et des fleches)
     private void nDraw(Canvas canvas) {
 
         canvas.drawRGB(242, 243, 244);
         paintcarte(canvas);
-        //canvas.drawRect(50, 50, 80, 80, paint);
-        //drawRect(left, top, right, bottom, paint)
+
+
         }
 
 
 
-    /*fonction permettant de recuperer les coordonnés d'une case
-    public void  getinfo(float x,float y){
-
-        float leftclick=    x-carteLeftAnchor;
-        float topclick=    y-carteTopAnchor;
-
-        if(leftclick >0 && topclick>0) {
-            float xx=leftclick/carteTileSize;
-            float yy=topclick /carteTileSize;
-            if (xx <carteWidth && yy < carteWidth)
-               og.i("",xx.intValue() + ":"+yy.intValue());
-            else
-                Log.i("","vous avez cliqué à l'exterieure du carré");
-
-        }
-
-    }}*/
 
     // callback sur le cycle de vie de la surfaceview
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
@@ -357,21 +385,69 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
         Log.i("-> FCT <-", "event.getX: " + event.getX());
         Log.i("-> FCT <-", "event.getY: " + event.getY());
         Log.i("-> FCT <-", "getWidth: " + deux.getWidth());
-        if (event.getY() < 50) {
-            onKeyDown(KeyEvent.KEYCODE_DPAD_UP, null);
 
-        } else if (event.getY() > getHeight() - 50) {
-            if (event.getX() > getWidth() - 50) {
-                onKeyDown(KeyEvent.KEYCODE_0, null);
-            } else {
-                onKeyDown(KeyEvent.KEYCODE_DPAD_DOWN, null);
-            }
-        } else if (event.getX() < 50) {
-            onKeyDown(KeyEvent.KEYCODE_DPAD_LEFT, null);
-        } else if (event.getX() > getWidth() - 50) {
-            onKeyDown(KeyEvent.KEYCODE_DPAD_RIGHT, null);
+
+
+
+        float x=event.getX();
+        float y=event.getY();
+        Log.i("-> FCT <-", "event.getX: " +x);
+        Log.i("-> FCT <-", "event.getY: " +y);
+
+        int j= (int) (x/(getWidth()/9));
+        int i= (int) ((y/(getWidth()/9))-((y/(getWidth()/9))/(y/145)));
+        int jPetitMat= (int) ((x/(getWidth()/9)));
+        int iPetitMat= (int) (((y/(getWidth()/9))-((y/(getWidth()/9))/(y/145+40)))-11);
+        Log.i("-> FCT <-", "i=: " +i);
+        Log.i("-> FCT <-", "j=: " +j);
+
+        Log.i("-> FCT <-", "iPetitMat=: " +(iPetitMat-11));
+        Log.i("-> FCT <-", "jPetitMat=: " +jPetitMat);
+
+        int CaseChoisiePetiteMat=LaCaseChoiisePetiteMat(iPetitMat,jPetitMat);
+
+
+        if (CaseChoisiePetiteMat==3){
+            matrice[1][3]=CST_cinq;
         }
 
-        return super.onTouchEvent(event);
+        Log.i("-> FCT <-", "case" + "=: " +CaseChoisiePetiteMat);
+
+
+
+
+
+
+
+        //button jaune
+        float leftRectButton= RectButtonSupprimer.left;
+        float topRectButton= RectButtonSupprimer.top;
+        float widthRectButton= RectButtonSupprimer.width();
+        float heightRectButton= RectButtonSupprimer.height();
+
+        Log.i("-> FCT <-", "leftRectButton" + "=: " +leftRectButton);
+        Log.i("-> FCT <-", "topRectButton" + "=: " +topRectButton);
+
+
+
+
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                Log.i("-> FCT <-", "onTouchEvent: Down Amar ");
+
+
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.i("-> FCT <-", "onTouchEvent: ACTION_UP ");
+
+                break;
+
+
+            case MotionEvent.ACTION_MOVE:
+                Log.i("-> FCT <-", "onTouchEvent: ACTION_MOVE ");
+
+                break;
+        }
+        return true;
     }
 }

@@ -4,9 +4,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+
 	<com.sudoku_android_master.sudokuyas.SudokuView
 		android:id="@+id/SudokuView"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent" />    
+		android:layout_height="fill_parent" />
 
 </FrameLayout>
