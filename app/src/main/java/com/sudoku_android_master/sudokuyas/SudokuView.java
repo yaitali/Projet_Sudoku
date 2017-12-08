@@ -12,7 +12,6 @@ import android.view.SurfaceView;
 
 public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
     // Declaration des images
-   // private Bitmap vert;
     private Bitmap vide;
     private Bitmap un;
     private Bitmap deux;
@@ -33,13 +32,10 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     int compteur=0;
     int CaseChoisiePetiteMat;
     int OrigineI, OrigineY, mI,mJ;
-    int monI=99, monJ=99;
     boolean caseSelectionner=false;
-
+    int[] tableauCaseSelectionnerGrandeMatrice= new int[2];
     // tableau modelisant la carte du jeu
     int[][] matrice;
-    int[] tableauCaseSelectionnerGrandeMatrice= new int[2];
-    //int [][] CaseARemplacer;
     // ancres pour pouvoir centrer la carte du jeu
     int carteTopAnchor;                   // coordonnées en Y du point d'ancrage de notre carte
     int carteLeftAnchor;                  // coordonnées en X du point d'ancrage de notre carte
@@ -62,7 +58,6 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     static final int CST_neuf = 9;
     static final int CST_Vide = 0;
     static final int CST_vert = 77;
-
     // constante modelisant les differentes types de cases de gestion celelules
     static final int G_un = 1;
     static final int G_deux = 2;
@@ -76,7 +71,6 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     static final int G_effacer = 10;
     static final int G_renitialiser = 11;
     static final int G_verifier = 12;
-
     // tableau de reference du terrain
     int[][] niveau1 = {
             {CST_un, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
@@ -89,16 +83,11 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
             {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_trois, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
             {CST_sept, CST_Vide, CST_huite, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_un, CST_Vide},
     };
-
     //tableau de gestion de la grille
-
     int[][] mat_gestion = {
-
             {G_un, G_deux, G_trois,G_quatre, G_cinq, G_six,G_sept,G_huite, G_neuf}
     };
-
     int[][] mat_btn = {
-
             {G_effacer, G_renitialiser, G_verifier}
     };
 
@@ -152,19 +141,17 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
             }
         }
     }
+/*
+séléctionner une case(la derniere ) dans la grille et récuperer ses coordonnées (i,j)
+pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiffres.
+ */
 
     public int[]SelectedCaseVert(int i, int j){
-
-
             int[] res = new int[2];
-
-
-
         if(i>-1 && i<9 && j>-1 && j<9) {
             if (matrice[i][j] == CST_Vide && compteur != 1) {
                 matrice[i][j] = CST_vert;
                 caseSelectionner = true;
-
                 OrigineI = i;
                 OrigineY = j;
                 compteur = 1;
@@ -179,18 +166,14 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
                 matrice[i][j] = CST_Vide;
                 caseSelectionner = false;
 
-
             }
             res[0]=i;
             res[1]=j;
         }else{
-
             res[0]=99;
             res[1]=99;
             caseSelectionner = false;
         }
-
-
 
         return res;
     }
@@ -226,6 +209,31 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
             }
 
         }
+
+    public void btnclic(int i, int j) {
+        int niveau=1;
+        if (i == 0 && j == 1) {
+
+
+        } else if (i == 0 && j == 1) {
+            if (niveau==1){
+
+            }else if (niveau==2) {
+
+            }  else if(niveau==3){
+
+            } else {
+
+            }
+
+        } else if (i == 0 && j == 2) {
+
+        }
+        else {
+
+        }
+
+    }
 
     // initialisation du jeu
     public void initparameters() {
@@ -395,10 +403,15 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
         int i= (int) ((y/(getWidth()/9))-((y/(getWidth()/9))/(y/100)));
         int jPetitMat= (int) ((x/(getWidth()/9)));
         int iPetitMat= (int)  ((y/(getWidth()/9))-((y/(getWidth()/9))/(y/100+95))-11);
+
+        int jmatbtn= (int) ((x/(getWidth()/3)));
+        int imatbtn= (int)  (((y/(getWidth()/3))-(y/(getWidth()/3))/(y/100+95+80 ))-4);
         Log.i("-> FCT <-", "i=: " +i);
         Log.i("-> FCT <-", "j=: " +j);
-       Log.i("-> FCT <-", "iPetitMat=: " +(iPetitMat));
-       Log.i("-> FCT <-", "jPetitMat=: " +jPetitMat);
+        Log.i("-> FCT <-", "iPetitMat=: " +(iPetitMat));
+        Log.i("-> FCT <-", "jPetitMat=: " +jPetitMat);
+        Log.i("-> FCT <-", "jmatbtn=: " +(jmatbtn));
+        Log.i("-> FCT <-", "imatbtn=: " +(imatbtn));
 
 
 
@@ -408,11 +421,9 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
         if(caseSelectionner==true && CaseChoisiePetiteMat!=99 ){
             mI=tableauCaseSelectionnerGrandeMatrice[0];
             mJ=tableauCaseSelectionnerGrandeMatrice[1];
-            Log.i("-> FCT <-", "on est la!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ");
             Log.i("-> FCT <-", "mi "+mI);
             Log.i("-> FCT <-", "mJ "+mJ);
             Log.i("-> FCT <-", "CaseChoisiePetiteMat "+CaseChoisiePetiteMat);
-
             if (CaseChoisiePetiteMat==1){
                 matrice[mI][mJ]=CST_un;
             }else if (CaseChoisiePetiteMat==2){
@@ -453,9 +464,9 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
         }
         return true;
     }
-}
 
-/* verifications
+
+
 public boolean checkSudoku( int[][] matrice){
 		return (checkHorizontal(matrice) || checkVertical(matrice) || checkRegions(matrice));
 	}
@@ -525,6 +536,61 @@ private boolean checkRegions(int[][] matrice) {
 		}
 		return true;
 	}
+
+
+
+	private boolean checkConflict( int[][] matrice , int currentPos , final int number){
+		int xPos = currentPos % 9;
+		int yPos = currentPos / 9;
+
+		if( checkHorizontalConflict(matrice, xPos, yPos, number) || checkVerticalConflict(matrice, xPos, yPos, number) || checkRegionConflict(matrice, xPos, yPos, number) ){
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Return true if there is a conflict
+	 * @param matrice
+	 * @param xPos
+	 * @param yPos
+	 * @param number
+	 * @return
+	 */
+private boolean checkHorizontalConflict( final int[][] matrice , final int xPos , final int yPos , final int number ){
+    for( int x = xPos - 1; x >= 0 ; x-- ){
+        if( number == matrice[x][yPos]){
+            return true;
+        }
+    }
+
+    return false;
 }
 
- */
+    private boolean checkVerticalConflict( final int[][] matrice , final int xPos , final int yPos , final int number ){
+        for( int y = yPos - 1; y >= 0 ; y-- ){
+            if( number == matrice [xPos][y] ){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean checkRegionConflict( final int[][] matrice , final int xPos , final int yPos , final int number ){
+        int xRegion = xPos / 3;
+        int yRegion = yPos / 3;
+
+        for( int x = xRegion * 3 ; x < xRegion * 3 + 3 ; x++ ){
+            for( int y = yRegion * 3 ; y < yRegion * 3 + 3 ; y++ ){
+                if( ( x != xPos || y != yPos ) && number == matrice[x][y] ){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+}
