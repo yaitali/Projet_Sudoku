@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
     // Declaration des images
@@ -43,6 +44,7 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     int niveau=1;
     int CaseChoisiePetiteMat;
     int btnSup,ibtn,jbtn;
+    String winer;
     int OrigineI, OrigineY, mI,mJ,J,I;
     boolean caseSelectionner=false;
     int[] tableauCaseSelectionnerGrandeMatrice= new int[2];
@@ -104,26 +106,48 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
             {CST_neuf, CST_sept, CST_trois, CST_six, CST_un, CST_quatre, CST_cinq, CST_deux, CST_huite},
     };
     int[][] MEDIEUM = {
-            {CST_un, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_deux, CST_un, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_huite, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_Vide, CST_six, CST_trois, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_deux, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_trois, CST_Vide},
-            {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_cinq, CST_un, CST_Vide, CST_Vide},
-            {CST_Vide, CST_Vide,CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_trois, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_sept, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_un, CST_Vide},
+            {CST_cinq, CST_Vide, CST_Vide, CST_trois, CST_deux, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
+            {CST_Vide, CST_Vide, CST_deux, CST_Vide, CST_un, CST_neuf, CST_Vide, CST_sept, CST_Vide},
+            {CST_Vide, CST_Vide, CST_six, CST_huite, CST_Vide, CST_Vide, CST_deux, CST_Vide, CST_Vide},
+            {CST_six, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_deux},
+            {CST_huite, CST_quatre, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_trois, CST_sept},
+            {CST_neuf, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_six},
+            {CST_Vide, CST_Vide,CST_cinq, CST_Vide, CST_Vide, CST_trois, CST_neuf, CST_Vide, CST_Vide},
+            {CST_Vide, CST_neuf, CST_Vide, CST_quatre, CST_cinq, CST_Vide, CST_six, CST_Vide, CST_Vide},
+            {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_six, CST_un, CST_Vide, CST_Vide, CST_huite},
+    };
+    int[][] MEDIEUM_SOLUTION = {
+            {CST_cinq, CST_sept, CST_neuf, CST_trois, CST_deux, CST_quatre, CST_huite, CST_six, CST_un},
+            {CST_quatre, CST_huite, CST_deux, CST_six, CST_un, CST_neuf, CST_trois, CST_sept, CST_cinq},
+            {CST_trois, CST_un, CST_six, CST_huite, CST_sept, CST_cinq, CST_deux, CST_quatre, CST_neuf},
+            {CST_six, CST_cinq, CST_sept, CST_un, CST_trois, CST_huite, CST_quatre, CST_neuf, CST_deux},
+            {CST_huite, CST_quatre, CST_un, CST_deux, CST_neuf, CST_six, CST_cinq, CST_trois, CST_sept},
+            {CST_neuf, CST_deux, CST_trois, CST_cinq, CST_quatre, CST_sept, CST_un, CST_huite, CST_six},
+            {CST_un, CST_six,CST_cinq, CST_sept, CST_huite, CST_trois, CST_neuf, CST_deux, CST_quatre},
+            {CST_sept, CST_neuf, CST_huite, CST_quatre, CST_cinq, CST_deux, CST_six, CST_un, CST_trois},
+            {CST_deux, CST_trois, CST_quatre, CST_neuf, CST_six, CST_un, CST_sept, CST_cinq, CST_huite},
     };
     int[][] HARD = {
-            {CST_un, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_deux, CST_un, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_six},
-            {CST_huite, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_Vide, CST_six, CST_trois, CST_un, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_deux, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_cinq, CST_un, CST_Vide, CST_cinq},
-            {CST_neuf, CST_Vide, CST_trois, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_trois, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
+            {CST_cinq, CST_Vide, CST_Vide, CST_trois, CST_deux, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
+            {CST_Vide, CST_Vide, CST_deux, CST_Vide, CST_un, CST_neuf, CST_Vide, CST_sept, CST_Vide},
+            {CST_Vide, CST_Vide, CST_six, CST_huite, CST_Vide, CST_Vide, CST_deux, CST_Vide, CST_Vide},
+            {CST_six, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_deux},
+            {CST_huite, CST_quatre, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_trois, CST_sept},
+            {CST_neuf, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_six},
+            {CST_Vide, CST_Vide, CST_cinq, CST_Vide, CST_Vide, CST_trois, CST_neuf, CST_Vide, CST_Vide},
+            {CST_Vide, CST_neuf, CST_Vide, CST_quatre, CST_cinq, CST_Vide, CST_six, CST_Vide, CST_Vide},
+            {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_six, CST_un, CST_Vide, CST_Vide, CST_huite},
+    };
+    int[][] HARD_solution = {
+            {CST_cinq, CST_sept, CST_neuf, CST_trois, CST_deux, CST_quatre, CST_huite, CST_six, CST_un},
+            {CST_quatre, CST_huite, CST_deux, CST_six, CST_un, CST_neuf, CST_trois, CST_sept, CST_cinq},
+            {CST_trois, CST_un, CST_six, CST_huite, CST_sept, CST_cinq, CST_deux, CST_quatre, CST_neuf},
+            {CST_six, CST_cinq, CST_sept, CST_un, CST_trois, CST_huite, CST_quatre, CST_neuf, CST_deux},
+            {CST_huite, CST_quatre, CST_un, CST_deux, CST_neuf, CST_six, CST_cinq, CST_trois, CST_sept},
+            {CST_neuf, CST_deux, CST_trois, CST_cinq, CST_quatre, CST_sept, CST_un, CST_huite, CST_six},
+            {CST_un, CST_six, CST_cinq, CST_sept, CST_huite, CST_trois, CST_neuf, CST_deux, CST_quatre},
+            {CST_sept, CST_neuf, CST_huite, CST_quatre, CST_cinq, CST_deux, CST_six, CST_un, CST_trois},
+            {CST_deux, CST_trois, CST_quatre, CST_neuf, CST_six, CST_un, CST_sept, CST_cinq, CST_huite},
     };
 
     int[][] mat_gestion = {
@@ -256,7 +280,8 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
 
         return res;
     }
-    /***********************************************pour l'effacement*****************************************************/
+
+
    public int[]GestionGrandeMatrice(int i, int j){
         int[] resultat = new int[2];
         if(i>-1 && i<9 && j>-1 && j<9) {
@@ -325,6 +350,28 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
             return 99;
         }
     }
+
+    public boolean VerificationGrilleSudoku(int i,int j){
+        boolean GrilleResolue =false;
+        for ( i=0; i< carteHeight; i++) {
+            for (j=0; j< carteWidth; j++) {
+                if  (matrice[i][j]==EASY_Sol[i][j] && matrice[i][j]!=CST_Vide){
+                    GrilleResolue =true;
+                    Log.i("-> FCT <-", "La grille est bien remplie : " + GrilleResolue);
+
+                }else if (matrice[i][j]!=EASY_Sol[i][j] ){
+                    matrice[i][j]=CST_Vide;
+                    GrilleResolue=false;
+                    Log.i("-> FCT <-", "cette case est mal remplie: " + (matrice[i][j]));
+                }
+            }
+        }
+        return GrilleResolue ;
+
+    };
+
+
+
     private void paintWin(Canvas canvas) {
         canvas.drawBitmap(win, carteLeftAnchor + 30, carteTopAnchor + 20, null);
     }
@@ -438,14 +485,17 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
     }
     //dessin de fond
 
-    public boolean isWon()
-    {
-        boolean won = true;
-        int i = 0;
-        int j = 0;
+    public boolean isWon(String winer) {
+        boolean iswon = false;
+        if (winer == "g") {
+            iswon = true;
 
-     return false;
+        } else if (winer=="e") {
+            iswon = false;
+        }
+        return iswon;
     }
+
     // dessin du jeu (fond uni, en fonction du jeu gagne ou pas dessin du plateau et du joueur des diamants et des fleches)
 
         private void paintParametres(Canvas canvas)
@@ -456,10 +506,10 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
             //text.setStyle(Paint.Style.FILL_AND_STROKE);
             text.setFakeBoldText(true);
             if (niveau == 1) {
-                if (isWon()) {
+                if (isWon(winer)) {
                     paintWithe(canvas);
                     paintWin(canvas);
-                }if(!isWon())
+                }if(!isWon(winer))
                 {
                     displayDialog = true;
                     text.setColor(Color.BLACK);
@@ -470,10 +520,10 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
                     canvas.drawText(""+ time + "", getWidth()-120, 40, text);
                 }
             }else if (niveau == 2) {
-                if (isWon()) {
+                if (isWon(winer)) {
                     paintWithe(canvas);
                     paintWin(canvas);
-                }if(!isWon())
+                }if(!isWon(winer))
                 {
                     displayDialog = true;
                     text.setColor(Color.BLACK);
@@ -484,10 +534,10 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
                     canvas.drawText(""+ time + "", getWidth()-120, 40, text);
                 }
             }else if (niveau == 3) {
-                if (isWon()) {
+                if (isWon(winer)) {
                     paintWithe(canvas);
                     paintWin(canvas);
-                } if(!isWon())
+                } if(!isWon(winer))
                 {
                     displayDialog = true;
                     text.setColor(Color.BLACK);
@@ -549,208 +599,6 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
         }
     }
 
-    public boolean VerificationHorizontalLibre( int caseChoisiePetiteMat,int IGrandeMatrice,int JGrandMatrice){
-
-        Clibre=false;
-        int j=0;
-        while(matrice[IGrandeMatrice][j]!=caseChoisiePetiteMat || j <9){
-
-            Clibre=true;
-            Log.i("-> FCT <-", "maaaaaaaaaaaatrrrrrrrrrrrrrrrrrrrrrrrrriiiiiiiceeee=: " +(matrice[IGrandeMatrice][j]));
-            Log.i("-> FCT <-", "cliiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiibreeeeeeeeeee=: " + Clibre);
-
-            j++;
-        }
-        return  Clibre;
-    }
-    public boolean VerificationVerticalLibre( int caseChoisiePetiteMat,int IGrandeMatrice,int JGrandMatrice){
-
-        Clibre=false;
-        int i=0;
-        while(matrice[i][JGrandMatrice]!=caseChoisiePetiteMat || i <9){
-            Clibre=true;
-            i++;
-        }
-        return  Clibre;
-    }
-    public boolean VerificationRegionLibre( int caseChoisiePetiteMat,int IGrandeMatrice,int JGrandMatrice){
-        Clibre=false;
-             if (IGrandeMatrice>-1 && JGrandMatrice>-1 && IGrandeMatrice <3 && JGrandMatrice <3){
-                 for ( int i=0 ;i<3;i++){
-                     for (int j =0 ; j<3; j++){
-                         if(caseChoisiePetiteMat != matrice[i][j]){
-                            Clibre=true;
-                         }else {
-                             Clibre=false;
-                         }
-                     }
-                 }
-             }else if  (IGrandeMatrice>2&& JGrandMatrice>2 && IGrandeMatrice <6 && JGrandMatrice <6){
-                 for ( int i=3 ;i<6;i++) {
-                     for (int j = 3; j < 6; j++) {
-                         if (caseChoisiePetiteMat != matrice[i][j]) {
-                             Clibre = true;
-                         } else {
-                             Clibre = false;
-                         }
-                     }
-                 }
-             }else if  (IGrandeMatrice> 5&& JGrandMatrice>5 && IGrandeMatrice <9 && JGrandMatrice <9){
-                 for ( int i=6 ;i<9;i++) {
-                     for (int j = 6; j < 9; j++) {
-                         if (caseChoisiePetiteMat != matrice[i][j]) {
-                             Clibre = true;
-                         } else {
-                             Clibre = false;
-                         }
-                     }
-                 }
-             }else if  (IGrandeMatrice> -1&& JGrandMatrice>2 && IGrandeMatrice <3 && JGrandMatrice <6){
-                 for ( int i=0 ;i<3;i++) {
-                     for (int j = 3; j < 6; j++) {
-                         if (caseChoisiePetiteMat != matrice[i][j]) {
-                             Clibre = true;
-                         } else {
-                             Clibre = false;
-                         }
-                     }
-                 }
-             }else if  (IGrandeMatrice> -1&& JGrandMatrice>5 && IGrandeMatrice <3 && JGrandMatrice <9){
-                 for ( int i=0 ;i<3;i++) {
-                     for (int j = 6; j < 9; j++) {
-                         if (caseChoisiePetiteMat != matrice[i][j]) {
-                             Clibre = true;
-                         } else {
-                             Clibre = false;
-                         }
-                     }
-                 }
-             }else if  (IGrandeMatrice> 2&& JGrandMatrice>-1 && IGrandeMatrice <6 && JGrandMatrice <3){
-                 for ( int i=3 ;i<6;i++) {
-                     for (int j = 0; j < 3; j++) {
-                         if (caseChoisiePetiteMat != matrice[i][j]) {
-                             Clibre = true;
-                         } else {
-                             Clibre = false;
-                         }
-                     }
-                 }
-             }else if  (IGrandeMatrice> 2&& JGrandMatrice>5 && IGrandeMatrice <6 && JGrandMatrice <9){
-                 for ( int i=3 ;i<6;i++) {
-                     for (int j = 6; j < 9; j++) {
-                         if (caseChoisiePetiteMat != matrice[i][j]) {
-                             Clibre = true;
-                         } else {
-                             Clibre = false;
-                         }
-                     }
-                 }
-             }else if  (IGrandeMatrice> 5&& JGrandMatrice>-1 && IGrandeMatrice <3 && JGrandMatrice <9){
-                 for ( int i=6 ;i<9;i++) {
-                     for (int j = 0; j < 3; j++) {
-                         if (caseChoisiePetiteMat != matrice[i][j]) {
-                             Clibre = true;
-                         } else {
-                             Clibre = false;
-                         }
-                     }
-                 }
-             }else if  (IGrandeMatrice> 5&& JGrandMatrice>2 && IGrandeMatrice <3 && JGrandMatrice <6){
-                 for ( int i=6 ;i<9;i++) {
-                     for (int j = 3; j < 6; j++) {
-                         if (caseChoisiePetiteMat != matrice[i][j]) {
-                             Clibre = true;
-                         } else {
-                             Clibre = false;
-                         }
-                     }
-                 }
-             }
-        return Clibre;
-    }
-/*
-    private boolean checkHorizontal(int IGrandeMatrice,int JGrandeMatrice) {
-
-        for( int j = 0 ; j < 9 ; j++ ){
-
-                int i = IGrandeMatrice  ;
-                    if( matrice [IGrandeMatrice][j] == matrice[i][j]  ){
-                        return false;
-                    }
-                }
-
-        return true;
-    }
-
-    public boolean checkVertical(int IGrandeMatrice,int JGrandeMatrice) {
-        for( int i = 0 ; i < 9 ; i++ ){
-            for(  JGrandeMatrice = 0 ; JGrandeMatrice < 9 ; JGrandeMatrice++ ){
-
-                for( int j = JGrandeMatrice + 1 ; j < 9 ; j++ ){
-                    if( matrice[i][JGrandeMatrice] == matrice[i][j]  ){
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-    public boolean checkRegion(int IGrandeMatrice,int JGrandeMatrice,int iRegion,int jRegion){
-        for(  IGrandeMatrice = iRegion * 3; IGrandeMatrice < iRegion * 3 + 3 ; IGrandeMatrice++ ){
-            for(  JGrandeMatrice = jRegion * 3 ; JGrandeMatrice < jRegion * 3 + 3 ; JGrandeMatrice++ ){
-                for( int i = IGrandeMatrice ; i < iRegion * 3 + 3 ; i++ ){
-                    for( int j = JGrandeMatrice ; j < jRegion * 3 + 3 ; j++ ){
-                        if( (( i != IGrandeMatrice || j != JGrandeMatrice) && matrice[IGrandeMatrice][JGrandeMatrice] == matrice[i][j] ) ){
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-        return true;
-    }
-    public boolean checkRegions(int IGrandeMatrice,int JGrandeMatrice) {
-        for( int iRegion = 0; iRegion < 3; iRegion++ ){
-            for( int jRegion = 0; jRegion < 3 ; jRegion++ ){
-                if( !checkRegion(IGrandeMatrice,JGrandeMatrice, iRegion, jRegion) ){
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-*/
-    public void FonctionInsertLibre(int caseChoisiePetiteMat,int IGrandeMatrice,int JGrandeMatrice){
-
-            if  (VerificationVerticalLibre(caseChoisiePetiteMat, IGrandeMatrice, JGrandeMatrice) || VerificationHorizontalLibre(caseChoisiePetiteMat, IGrandeMatrice, JGrandeMatrice)
-                    || VerificationRegionLibre(caseChoisiePetiteMat, IGrandeMatrice, JGrandeMatrice) ) {
-
-                    if (CaseChoisiePetiteMat == 1) {
-                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_un;
-                    } else if (CaseChoisiePetiteMat == 2) {
-                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_deux;
-                    } else if (CaseChoisiePetiteMat == 3) {
-                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_trois;
-                    } else if (CaseChoisiePetiteMat == 4) {
-                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_quatre;
-                    } else if (CaseChoisiePetiteMat == 5) {
-                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_cinq;
-                    } else if (CaseChoisiePetiteMat == 6) {
-                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_six;
-                    } else if (CaseChoisiePetiteMat == 7) {
-                        Log.i("-> FCT <-", "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll ");
-                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_sept;
-                    } else if (CaseChoisiePetiteMat == 8) {
-                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_huite;
-                    } else if (CaseChoisiePetiteMat == 9) {
-                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_neuf;
-                    }
-                }else{
-                Log.i("-> FCT <-", "Echec controleur " );
-            }
-
-        }
 
 
     // fonction permettant de recuperer les evenements tactiles
@@ -779,17 +627,33 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
          CaseChoisiePetiteMat=LaCaseChoisiePetiteMat(iPetitMat,jPetitMat);
          btnSup = btnSup( imatbtn,  jmatbtn);
          Log.i("-> FCT <-", "btnSup" + "=: " +btnSup);
-        mI=tableauCaseSelectionnerGrandeMatrice[0];
-        mJ=tableauCaseSelectionnerGrandeMatrice[1];
+
         if(caseSelectionner==true && CaseChoisiePetiteMat!=99){
             mI=tableauCaseSelectionnerGrandeMatrice[0];
             mJ=tableauCaseSelectionnerGrandeMatrice[1];
             Log.i("-> FCT <-", "mi "+mI);
             Log.i("-> FCT <-", "mJ "+mJ);
             Log.i("-> FCT <-", "CaseChoisiePetiteMat "+CaseChoisiePetiteMat);
-            Log.i("-> FCT <-", "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk ");
-            FonctionInsertLibre(CaseChoisiePetiteMat,mI,mJ);
-
+           // FonctionInsertLibre(CaseChoisiePetiteMat,mI,mJ);
+            if (CaseChoisiePetiteMat == 1) {
+                matrice[mI][mJ] = CST_un;
+            } else if (CaseChoisiePetiteMat == 2) {
+                matrice[mI][mJ] = CST_deux;
+            } else if (CaseChoisiePetiteMat == 3) {
+                matrice[mI][mJ] = CST_trois;
+            } else if (CaseChoisiePetiteMat == 4) {
+                matrice[mI][mJ] = CST_quatre;
+            } else if (CaseChoisiePetiteMat == 5) {
+                matrice[mI][mJ] = CST_cinq;
+            } else if (CaseChoisiePetiteMat == 6) {
+                matrice[mI][mJ] = CST_six;
+            } else if (CaseChoisiePetiteMat == 7) {
+                matrice[mI][mJ] = CST_sept;
+            } else if (CaseChoisiePetiteMat == 8) {
+                matrice[mI][mJ] = CST_huite;
+            } else if (CaseChoisiePetiteMat == 9) {
+                matrice[mI][mJ] = CST_neuf;
+            }
         }
         if(caseSelectionner==true && btnSup!=99 ){
             I=tableauCaseSelectionnerGrandeMatrice1[0];
@@ -799,14 +663,15 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
             Log.i("-> FCT <-", "btnSup "+btnSup);
             if (btnSup==11){
                 matrice[I][J]=CST_Vide;
-            } if (btnSup==12){
+            }
+            if (btnSup==12){
                 if ( initparameters(niveau)==1){
                     initparameters(1) ;
                 }else if(initparameters(niveau)==2){
                     initparameters(2) ;
                 }else if (initparameters(niveau)==3){
                     initparameters(3) ;
-                };
+                }
             }
             }
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
@@ -832,6 +697,21 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
 
                 };
             }
+                if (btnSup==13){
+                    String winer;
+                    mI=tableauCaseSelectionnerGrandeMatrice[0];
+                    mJ=tableauCaseSelectionnerGrandeMatrice[1];
+
+                    if (VerificationGrilleSudoku(mI,mJ)){
+                        Toast.makeText(mContext, "Bravo,vous avez résolu cette grille sudoku!!.", Toast.LENGTH_LONG).show();
+
+
+                    }else if (!VerificationGrilleSudoku(mI,mJ)){
+                        winer="e";
+                        isWon(winer);
+                        Toast.makeText(mContext, "Oh non,vous avez mal rempli la grille!!.recommencez avec sur les cases vides", Toast.LENGTH_LONG).show();
+                    };
+                }
 
             break;
             case MotionEvent.ACTION_MOVE:
@@ -846,6 +726,5 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
 
 
 }
-
 
 
