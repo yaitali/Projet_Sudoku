@@ -1,9 +1,12 @@
 package com.sudoku_android_master.sudokuyas;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -25,10 +28,17 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     private Bitmap effacer;
     private Bitmap renitialiser;
     private Bitmap verifier;
-    private Bitmap backgrd;
-    // Declaration des objets Ressources et Context permettant d'accéder aux ressources de l'application et de les charger
+    private Bitmap win;
+    private Bitmap withe;
+
+    private Bitmap chrono;
+    private long beginChrono, endChrono;
+    boolean displayDialog = true;
+
+
     private Resources mRes;
     private Context mContext;
+    Paint text = new Paint();
     int compteur=0;
     int niveau=1;
     int CaseChoisiePetiteMat;
@@ -37,19 +47,15 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     boolean caseSelectionner=false;
     int[] tableauCaseSelectionnerGrandeMatrice= new int[2];
     int [] tableauCaseSelectionnerGrandeMatrice1=new int [2];
-    // tableau modelisant la carte du jeu
+    boolean Clibre;
     int[][] matrice;
-    // ancres pour pouvoir centrer la carte du jeu
     int carteTopAnchor;                   // coordonnées en Y du point d'ancrage de notre carte
     int carteLeftAnchor;                  // coordonnées en X du point d'ancrage de notre carte
-    // taille de la carte
     static final int carteWidth = 9;
     static final int carteHeight = 9;
     static final int MatWidth = 9;
     static final int MatHeight = 1;
-    // taille de la celelule de vecteur
     static final int carteTileSize = 20;
-    // constante modelisant les differentes types de cases
     static final int CST_un = 1;
     static final int CST_deux = 2;
     static final int CST_trois = 3;
@@ -61,7 +67,6 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     static final int CST_neuf = 9;
     static final int CST_Vide = 0;
     static final int CST_vert = 77;
-    // constante modelisant les differentes types de cases de gestion celelules
     static final int G_un = 1;
     static final int G_deux = 2;
     static final int G_trois = 3;
@@ -74,18 +79,29 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
     static final int G_effacer = 10;
     static final int G_renitialiser = 11;
     static final int G_verifier = 12;
-    // tableau de reference du terrain
+    // tableau de reference de la grille
 
     int[][] EASY = {
-            {CST_un, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_deux, CST_un, CST_Vide, CST_Vide, CST_Vide, CST_trois, CST_Vide, CST_six},
-            {CST_huite, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_Vide, CST_six, CST_trois, CST_un, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_deux, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_trois, CST_Vide},
-            {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_cinq, CST_un, CST_Vide, CST_cinq},
-            {CST_neuf, CST_Vide, CST_trois, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_trois, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
-            {CST_sept, CST_Vide, CST_huite, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_un, CST_Vide},
+            {CST_deux, CST_un, CST_neuf, CST_sept, CST_huite, CST_cinq, CST_trois, CST_six, CST_quatre},
+            {CST_cinq, CST_trois, CST_sept, CST_quatre, CST_six, CST_deux, CST_huite, CST_un, CST_neuf},
+            {CST_huite, CST_quatre, CST_six, CST_neuf, CST_trois, CST_un, CST_deux, CST_cinq, CST_sept},
+            {CST_six, CST_neuf, CST_quatre, CST_cinq, CST_sept, CST_trois, CST_un, CST_huite, CST_deux},
+            {CST_sept, CST_cinq, CST_deux, CST_un, CST_quatre, CST_huite, CST_neuf, CST_trois, CST_six},
+            {CST_trois, CST_huite, CST_Vide, CST_deux, CST_neuf, CST_six, CST_Vide, CST_quatre, CST_cinq},
+            {CST_quatre, CST_deux, CST_huite, CST_trois, CST_Vide, CST_sept, CST_six, CST_neuf, CST_un},
+            {CST_un, CST_six, CST_cinq, CST_huite, CST_deux, CST_neuf, CST_quatre, CST_sept, CST_trois},
+            {CST_neuf, CST_sept, CST_trois, CST_six, CST_un, CST_quatre, CST_cinq, CST_deux, CST_huite},
+    };
+    int[][] EASY_Sol = {
+            {CST_deux, CST_un, CST_neuf, CST_sept, CST_huite, CST_cinq, CST_trois, CST_six, CST_quatre},
+            {CST_cinq, CST_trois, CST_sept, CST_quatre, CST_six, CST_deux, CST_huite, CST_un, CST_neuf},
+            {CST_huite, CST_quatre, CST_six, CST_neuf, CST_trois, CST_un, CST_deux, CST_cinq, CST_sept},
+            {CST_six, CST_neuf, CST_quatre, CST_cinq, CST_sept, CST_trois, CST_un, CST_huite, CST_deux},
+            {CST_sept, CST_cinq, CST_deux, CST_un, CST_quatre, CST_huite, CST_neuf, CST_trois, CST_six},
+            {CST_trois, CST_huite, CST_un, CST_deux, CST_neuf, CST_six, CST_sept, CST_quatre, CST_cinq},
+            {CST_quatre, CST_deux, CST_huite, CST_trois, CST_cinq, CST_sept, CST_six, CST_neuf, CST_un},
+            {CST_un, CST_six, CST_cinq, CST_huite, CST_deux, CST_neuf, CST_quatre, CST_sept, CST_trois},
+            {CST_neuf, CST_sept, CST_trois, CST_six, CST_un, CST_quatre, CST_cinq, CST_deux, CST_huite},
     };
     int[][] MEDIEUM = {
             {CST_un, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
@@ -109,7 +125,7 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
             {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_trois, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
             {CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide, CST_Vide},
     };
-    //tableau de gestion de la grille
+
     int[][] mat_gestion = {
             {G_un, G_deux, G_trois,G_quatre, G_cinq, G_six,G_sept,G_huite, G_neuf}
     };
@@ -117,10 +133,11 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
             {G_effacer, G_renitialiser, G_verifier}
     };
 
-    //thread utiliser pour animer les zones de depot des diamants
+
     private boolean in = true;
     private Thread cv_thread;
     SurfaceHolder holder;
+
     /**
      * The constructor called from the main JetBoy activity
      * @param context
@@ -130,10 +147,8 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
 
     public SudokuView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        // permet d'ecouter les surfaceChanged, surfaceCreated, surfaceDestroyed
         holder = getHolder();
         holder.addCallback(this);
-        // chargement des images
         mContext = context;
         mRes = mContext.getResources();
          un 		= BitmapFactory.decodeResource(mRes, R.drawable.un);
@@ -150,16 +165,24 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
         effacer  =BitmapFactory.decodeResource(mRes, R.drawable.effacer);
         renitialiser   =BitmapFactory.decodeResource(mRes, R.drawable.renitialiser);
         verifier		= BitmapFactory.decodeResource(mRes, R.drawable.ecrire);
-        backgrd = BitmapFactory.decodeResource(mRes, R.drawable.gris);
+        win    = BitmapFactory.decodeResource(mRes, R.drawable.win);
+        chrono = BitmapFactory.decodeResource(mRes, R.drawable.chrono);
+        withe  = BitmapFactory.decodeResource(mRes, R.drawable.withe);
 
-        //initialisation des parmametres du jeu
         initparameters(1);
-        // creation du thread
         cv_thread = new Thread(this);
-        // prise de focus pour gestion des touches
         setFocusable(true);
     }
-    // chargement du niveau a partir du tableau de reference du niveau
+
+    public void startChrono(){
+        beginChrono = System.currentTimeMillis();
+    }
+    public void stopChrono(){
+        endChrono = System.currentTimeMillis();
+    }
+    public double getChrono() {
+        return ((endChrono - beginChrono) / 1000);
+    }
 
     private void loadlevel(int niveau) {
 
@@ -169,8 +192,9 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
                     matrice[j][i]= EASY[j][i];
 
                 }
-            }}
-        else if(niveau==2){
+            }
+
+        } else if(niveau==2){
             for (int i=0; i< carteHeight; i++) {
                 for (int j=0; j< carteWidth; j++) {
                     matrice[j][i]= MEDIEUM[j][i];
@@ -184,9 +208,9 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
 
                 }
             }}
-
+        startChrono();
     }
-    // initialisation du jeu
+
     public int initparameters(int niveau) {
         matrice = new int[carteHeight][carteWidth];
         int load;
@@ -199,21 +223,6 @@ public class SudokuView extends SurfaceView implements SurfaceHolder.Callback, R
             Log.e("-FCT-", "cv_thread.start()");
         } return niveau;
     }
-
-    // permet d'identifier si la partie est gagnee
-    private boolean isWon() {
-        for (int i = 0; i < carteHeight; i++) {
-            for (int j = 0; j < carteWidth; j++) {
-                if (checkSudoku(matrice)){
-
-                    Log.e("-FCT-", "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
-                }
-
-            }
-        }
-        return true;
-    }
-
 
 /*
 séléctionner une case(la derniere ) dans la grille et récuperer ses coordonnées (i,j)
@@ -247,6 +256,7 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
 
         return res;
     }
+    /***********************************************pour l'effacement*****************************************************/
    public int[]GestionGrandeMatrice(int i, int j){
         int[] resultat = new int[2];
         if(i>-1 && i<9 && j>-1 && j<9) {
@@ -315,9 +325,20 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
             return 99;
         }
     }
+    private void paintWin(Canvas canvas) {
+        canvas.drawBitmap(win, carteLeftAnchor + 30, carteTopAnchor + 20, null);
+    }
+    private void paintChrono(Canvas canvas) {
+        canvas.drawBitmap(chrono, getWidth()-80, 10 , null);
+    }
+
+    private void paintWithe(Canvas canvas) {
+        canvas.drawBitmap(withe, -10, -10, null);
+    }
 
 // dessin de la carte du jeu
     private void paintcarte(Canvas canvas) {
+        paintParametres(canvas);
         int x=getWidth();
         int tailleCarre = un.getHeight();
         for (int i = 0; i < carteHeight; i++) {
@@ -415,14 +436,78 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
         }
 
     }
+    //dessin de fond
 
+    public boolean isWon()
+    {
+        boolean won = true;
+        int i = 0;
+        int j = 0;
+
+     return false;
+    }
     // dessin du jeu (fond uni, en fonction du jeu gagne ou pas dessin du plateau et du joueur des diamants et des fleches)
+
+        private void paintParametres(Canvas canvas)
+        {
+            int time = (int) getChrono();
+            text.setTextSize(20);
+            text.setColor(Color.BLACK);
+            //text.setStyle(Paint.Style.FILL_AND_STROKE);
+            text.setFakeBoldText(true);
+            if (niveau == 1) {
+                if (isWon()) {
+                    paintWithe(canvas);
+                    paintWin(canvas);
+                }if(!isWon())
+                {
+                    displayDialog = true;
+                    text.setColor(Color.BLACK);
+                    text.setFakeBoldText(true);
+                    text.setTextSize(20);
+                    canvas.drawText("EASY", 12, carteTopAnchor / 6, text);
+                    paintChrono(canvas);
+                    canvas.drawText(""+ time + "", getWidth()-120, 40, text);
+                }
+            }else if (niveau == 2) {
+                if (isWon()) {
+                    paintWithe(canvas);
+                    paintWin(canvas);
+                }if(!isWon())
+                {
+                    displayDialog = true;
+                    text.setColor(Color.BLACK);
+                    text.setFakeBoldText(true);
+                    text.setTextSize(20);
+                    canvas.drawText("MEDIEUM", 12, carteTopAnchor / 6, text);
+                    paintChrono(canvas);
+                    canvas.drawText(""+ time + "", getWidth()-120, 40, text);
+                }
+            }else if (niveau == 3) {
+                if (isWon()) {
+                    paintWithe(canvas);
+                    paintWin(canvas);
+                } if(!isWon())
+                {
+                    displayDialog = true;
+                    text.setColor(Color.BLACK);
+                    text.setFakeBoldText(true);
+                    text.setTextSize(20);
+                    canvas.drawText("HARD", 12, carteTopAnchor / 6, text);
+                    paintChrono(canvas);
+                    canvas.drawText(""+ time + "", getWidth()-120, 40, text);
+                }
+            }
+
+            }
+
+
     private void nDraw(Canvas canvas) {
         canvas.drawRGB(242, 243, 244);
         paintcarte(canvas);
-         //canvas = new Canvas(backgrd.copy(Bitmap.Config.ARGB_8888, true));
-        }
 
+
+    }
     // callback sur le cycle de vie de la surfaceview
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.i("-> FCT <-", "surfaceChanged " + width + " - " + height);
@@ -442,11 +527,15 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
      * run (run du thread cr��)
      * on endort le thread, on modifie le compteur d'animation, on prend la main pour dessiner et on dessine puis on lib�re le canvas
      */
+
+
     public void run() {
         Canvas c = null;
         while (in) {
             try {
-                cv_thread.sleep(40);
+                cv_thread.sleep(300);
+                stopChrono();
+
                 try {
                     c = holder.lockCanvas(null);
                     nDraw(c);
@@ -456,10 +545,214 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
                     }
                 }
             } catch (Exception e) {
-                //Log.e("-> RUN <-", "PB DANS RUN");
             }
         }
     }
+
+    public boolean VerificationHorizontalLibre( int caseChoisiePetiteMat,int IGrandeMatrice,int JGrandMatrice){
+
+        Clibre=false;
+        int j=0;
+        while(matrice[IGrandeMatrice][j]!=caseChoisiePetiteMat || j <9){
+
+            Clibre=true;
+            Log.i("-> FCT <-", "maaaaaaaaaaaatrrrrrrrrrrrrrrrrrrrrrrrrriiiiiiiceeee=: " +(matrice[IGrandeMatrice][j]));
+            Log.i("-> FCT <-", "cliiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiibreeeeeeeeeee=: " + Clibre);
+
+            j++;
+        }
+        return  Clibre;
+    }
+    public boolean VerificationVerticalLibre( int caseChoisiePetiteMat,int IGrandeMatrice,int JGrandMatrice){
+
+        Clibre=false;
+        int i=0;
+        while(matrice[i][JGrandMatrice]!=caseChoisiePetiteMat || i <9){
+            Clibre=true;
+            i++;
+        }
+        return  Clibre;
+    }
+    public boolean VerificationRegionLibre( int caseChoisiePetiteMat,int IGrandeMatrice,int JGrandMatrice){
+        Clibre=false;
+             if (IGrandeMatrice>-1 && JGrandMatrice>-1 && IGrandeMatrice <3 && JGrandMatrice <3){
+                 for ( int i=0 ;i<3;i++){
+                     for (int j =0 ; j<3; j++){
+                         if(caseChoisiePetiteMat != matrice[i][j]){
+                            Clibre=true;
+                         }else {
+                             Clibre=false;
+                         }
+                     }
+                 }
+             }else if  (IGrandeMatrice>2&& JGrandMatrice>2 && IGrandeMatrice <6 && JGrandMatrice <6){
+                 for ( int i=3 ;i<6;i++) {
+                     for (int j = 3; j < 6; j++) {
+                         if (caseChoisiePetiteMat != matrice[i][j]) {
+                             Clibre = true;
+                         } else {
+                             Clibre = false;
+                         }
+                     }
+                 }
+             }else if  (IGrandeMatrice> 5&& JGrandMatrice>5 && IGrandeMatrice <9 && JGrandMatrice <9){
+                 for ( int i=6 ;i<9;i++) {
+                     for (int j = 6; j < 9; j++) {
+                         if (caseChoisiePetiteMat != matrice[i][j]) {
+                             Clibre = true;
+                         } else {
+                             Clibre = false;
+                         }
+                     }
+                 }
+             }else if  (IGrandeMatrice> -1&& JGrandMatrice>2 && IGrandeMatrice <3 && JGrandMatrice <6){
+                 for ( int i=0 ;i<3;i++) {
+                     for (int j = 3; j < 6; j++) {
+                         if (caseChoisiePetiteMat != matrice[i][j]) {
+                             Clibre = true;
+                         } else {
+                             Clibre = false;
+                         }
+                     }
+                 }
+             }else if  (IGrandeMatrice> -1&& JGrandMatrice>5 && IGrandeMatrice <3 && JGrandMatrice <9){
+                 for ( int i=0 ;i<3;i++) {
+                     for (int j = 6; j < 9; j++) {
+                         if (caseChoisiePetiteMat != matrice[i][j]) {
+                             Clibre = true;
+                         } else {
+                             Clibre = false;
+                         }
+                     }
+                 }
+             }else if  (IGrandeMatrice> 2&& JGrandMatrice>-1 && IGrandeMatrice <6 && JGrandMatrice <3){
+                 for ( int i=3 ;i<6;i++) {
+                     for (int j = 0; j < 3; j++) {
+                         if (caseChoisiePetiteMat != matrice[i][j]) {
+                             Clibre = true;
+                         } else {
+                             Clibre = false;
+                         }
+                     }
+                 }
+             }else if  (IGrandeMatrice> 2&& JGrandMatrice>5 && IGrandeMatrice <6 && JGrandMatrice <9){
+                 for ( int i=3 ;i<6;i++) {
+                     for (int j = 6; j < 9; j++) {
+                         if (caseChoisiePetiteMat != matrice[i][j]) {
+                             Clibre = true;
+                         } else {
+                             Clibre = false;
+                         }
+                     }
+                 }
+             }else if  (IGrandeMatrice> 5&& JGrandMatrice>-1 && IGrandeMatrice <3 && JGrandMatrice <9){
+                 for ( int i=6 ;i<9;i++) {
+                     for (int j = 0; j < 3; j++) {
+                         if (caseChoisiePetiteMat != matrice[i][j]) {
+                             Clibre = true;
+                         } else {
+                             Clibre = false;
+                         }
+                     }
+                 }
+             }else if  (IGrandeMatrice> 5&& JGrandMatrice>2 && IGrandeMatrice <3 && JGrandMatrice <6){
+                 for ( int i=6 ;i<9;i++) {
+                     for (int j = 3; j < 6; j++) {
+                         if (caseChoisiePetiteMat != matrice[i][j]) {
+                             Clibre = true;
+                         } else {
+                             Clibre = false;
+                         }
+                     }
+                 }
+             }
+        return Clibre;
+    }
+/*
+    private boolean checkHorizontal(int IGrandeMatrice,int JGrandeMatrice) {
+
+        for( int j = 0 ; j < 9 ; j++ ){
+
+                int i = IGrandeMatrice  ;
+                    if( matrice [IGrandeMatrice][j] == matrice[i][j]  ){
+                        return false;
+                    }
+                }
+
+        return true;
+    }
+
+    public boolean checkVertical(int IGrandeMatrice,int JGrandeMatrice) {
+        for( int i = 0 ; i < 9 ; i++ ){
+            for(  JGrandeMatrice = 0 ; JGrandeMatrice < 9 ; JGrandeMatrice++ ){
+
+                for( int j = JGrandeMatrice + 1 ; j < 9 ; j++ ){
+                    if( matrice[i][JGrandeMatrice] == matrice[i][j]  ){
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+    public boolean checkRegion(int IGrandeMatrice,int JGrandeMatrice,int iRegion,int jRegion){
+        for(  IGrandeMatrice = iRegion * 3; IGrandeMatrice < iRegion * 3 + 3 ; IGrandeMatrice++ ){
+            for(  JGrandeMatrice = jRegion * 3 ; JGrandeMatrice < jRegion * 3 + 3 ; JGrandeMatrice++ ){
+                for( int i = IGrandeMatrice ; i < iRegion * 3 + 3 ; i++ ){
+                    for( int j = JGrandeMatrice ; j < jRegion * 3 + 3 ; j++ ){
+                        if( (( i != IGrandeMatrice || j != JGrandeMatrice) && matrice[IGrandeMatrice][JGrandeMatrice] == matrice[i][j] ) ){
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    public boolean checkRegions(int IGrandeMatrice,int JGrandeMatrice) {
+        for( int iRegion = 0; iRegion < 3; iRegion++ ){
+            for( int jRegion = 0; jRegion < 3 ; jRegion++ ){
+                if( !checkRegion(IGrandeMatrice,JGrandeMatrice, iRegion, jRegion) ){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+*/
+    public void FonctionInsertLibre(int caseChoisiePetiteMat,int IGrandeMatrice,int JGrandeMatrice){
+
+            if  (VerificationVerticalLibre(caseChoisiePetiteMat, IGrandeMatrice, JGrandeMatrice) || VerificationHorizontalLibre(caseChoisiePetiteMat, IGrandeMatrice, JGrandeMatrice)
+                    || VerificationRegionLibre(caseChoisiePetiteMat, IGrandeMatrice, JGrandeMatrice) ) {
+
+                    if (CaseChoisiePetiteMat == 1) {
+                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_un;
+                    } else if (CaseChoisiePetiteMat == 2) {
+                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_deux;
+                    } else if (CaseChoisiePetiteMat == 3) {
+                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_trois;
+                    } else if (CaseChoisiePetiteMat == 4) {
+                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_quatre;
+                    } else if (CaseChoisiePetiteMat == 5) {
+                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_cinq;
+                    } else if (CaseChoisiePetiteMat == 6) {
+                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_six;
+                    } else if (CaseChoisiePetiteMat == 7) {
+                        Log.i("-> FCT <-", "llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll ");
+                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_sept;
+                    } else if (CaseChoisiePetiteMat == 8) {
+                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_huite;
+                    } else if (CaseChoisiePetiteMat == 9) {
+                        matrice[IGrandeMatrice][JGrandeMatrice] = CST_neuf;
+                    }
+                }else{
+                Log.i("-> FCT <-", "Echec controleur " );
+            }
+
+        }
+
+
     // fonction permettant de recuperer les evenements tactiles
 
     public boolean onTouchEvent(MotionEvent event) {
@@ -483,40 +776,22 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
         Log.i("-> FCT <-", "jmatbtn=: " +(jmatbtn));
         Log.i("-> FCT <-", "imatbtn=: " +(imatbtn));
 
-        CaseChoisiePetiteMat=LaCaseChoisiePetiteMat(iPetitMat,jPetitMat);
-
-        btnSup = btnSup( imatbtn,  jmatbtn);
+         CaseChoisiePetiteMat=LaCaseChoisiePetiteMat(iPetitMat,jPetitMat);
+         btnSup = btnSup( imatbtn,  jmatbtn);
          Log.i("-> FCT <-", "btnSup" + "=: " +btnSup);
-
-        if(caseSelectionner==true && CaseChoisiePetiteMat!=99 ){
+        mI=tableauCaseSelectionnerGrandeMatrice[0];
+        mJ=tableauCaseSelectionnerGrandeMatrice[1];
+        if(caseSelectionner==true && CaseChoisiePetiteMat!=99){
             mI=tableauCaseSelectionnerGrandeMatrice[0];
             mJ=tableauCaseSelectionnerGrandeMatrice[1];
             Log.i("-> FCT <-", "mi "+mI);
             Log.i("-> FCT <-", "mJ "+mJ);
             Log.i("-> FCT <-", "CaseChoisiePetiteMat "+CaseChoisiePetiteMat);
-            if (CaseChoisiePetiteMat==1){
-                matrice[mI][mJ]=CST_un;
-            }else if (CaseChoisiePetiteMat==2){
-                matrice[mI][mJ]=CST_deux;
-            }else if (CaseChoisiePetiteMat==3){
-                matrice[mI][mJ]=CST_trois;
-            }else if (CaseChoisiePetiteMat==4){
-                matrice[mI][mJ]=CST_quatre;
-            }else if (CaseChoisiePetiteMat==5){
-                matrice[mI][mJ]=CST_cinq;
-            }else if (CaseChoisiePetiteMat==6){
-                matrice[mI][mJ]=CST_six;
-            }else if (CaseChoisiePetiteMat==7){
-                matrice[mI][mJ]=CST_sept;
-            }else if (CaseChoisiePetiteMat==8){
-                matrice[mI][mJ]=CST_huite;
-            } else if (CaseChoisiePetiteMat==9){
-                matrice[mI][mJ]=CST_neuf;
-            }
+            Log.i("-> FCT <-", "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk ");
+            FonctionInsertLibre(CaseChoisiePetiteMat,mI,mJ);
+
         }
-
         if(caseSelectionner==true && btnSup!=99 ){
-
             I=tableauCaseSelectionnerGrandeMatrice1[0];
             J=tableauCaseSelectionnerGrandeMatrice1[1];
             Log.i("-> FCT <-", "I "+I);
@@ -531,12 +806,9 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
                     initparameters(2) ;
                 }else if (initparameters(niveau)==3){
                     initparameters(3) ;
-
                 };
             }
             }
-
-
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 Log.i("-> FCT <-", "onTouchEvent: Down ");
@@ -559,7 +831,9 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
                     initparameters(3) ;
 
                 };
-            } break;
+            }
+
+            break;
             case MotionEvent.ACTION_MOVE:
                 Log.i("-> FCT <-", "onTouchEvent: ACTION_MOVE ");
 
@@ -570,91 +844,8 @@ pour pouvoir la remplacer avec la case séléctionnée dans le vecteur des chiff
 
 
 
-    public boolean checkSudoku( int[][] matrice){
-        return (checkHorizontal(matrice) || checkVertical(matrice) || checkRegions(matrice));
-    }
 
-
-
-
-    private boolean checkHorizontal(int[][] matrice) {
-        for( int y = 0 ; y < 9 ; y++ ){
-            for( int xPos = 0 ; xPos < 9 ; xPos++ ){
-
-                if( matrice[xPos][y] == 0 ){
-                    return false;
-                }
-                for( int x = xPos + 1 ; x < 9 ; x++ ){
-                    if( matrice[xPos][y] == matrice[x][y] || matrice[x][y] == 0 ){
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
-
-
-    private boolean checkVertical(int[][] matrice) {
-        for( int x = 0 ; x < 9 ; x++ ){
-            for( int yPos = 0 ; yPos < 9 ; yPos++ ){
-
-                if( matrice[x][yPos] == 0 ){
-                    return false;
-                }
-                for( int y = yPos + 1 ; y < 9 ; y++ ){
-                    if( matrice[x][yPos] == matrice[x][y] || matrice[x][y] == 0 ){
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
-
-    private boolean checkRegions(int[][] matrice) {
-        for( int xRegion = 0; xRegion < 3; xRegion++ ){
-            for( int yRegion = 0; yRegion < 3 ; yRegion++ ){
-                if( !checkRegion(matrice, xRegion, yRegion) ){
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private boolean checkRegion(int[][] matrice , int xRegion , int yRegion){
-        for( int xPos = xRegion * 3; xPos < xRegion * 3 + 3 ; xPos++ ){
-            for( int yPos = yRegion * 3 ; yPos < yRegion * 3 + 3 ; yPos++ ){
-                for( int x = xPos ; x < xRegion * 3 + 3 ; x++ ){
-                    for( int y = yPos ; y < yRegion * 3 + 3 ; y++ ){
-                        if( (( x != xPos || y != yPos) && matrice[xPos][yPos] == matrice[x][y] ) || matrice[x][y] == 0 ){
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
-
-    public void checkGame(){
-        int [][] sudGrid = new int[9][9];
-        for( int x = 0 ; x < 9 ; x++ ){
-            for( int y = 0 ; y < 9 ; y++ ){
-                //sudGrid[x][y];
-            }
-        }
-
-        //  if( SudokuChecker.getInstance().checkSudoku(sudGrid)){
-        //  Toast.makeText(context, "You solved the sudoku.", Toast.LENGTH_LONG).show();
-    }
 }
-//}
+
 
 
